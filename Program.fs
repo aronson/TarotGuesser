@@ -24,10 +24,10 @@ let drawRandomCard =
     | _ -> raise (invalidOp "RNG machine broke")
     |> function
     | Trump -> Trump, (randomOrdinal % 22)
-    | Wand -> Wand, (randomOrdinal % 14)
+    | Wand  -> Wand, (randomOrdinal % 14)
     | Sword -> Sword, (randomOrdinal % 14)
-    | Cup -> Cup, (randomOrdinal % 14)
-    | Coin -> Coin, (randomOrdinal % 14)
+    | Cup   -> Cup, (randomOrdinal % 14)
+    | Coin  -> Coin, (randomOrdinal % 14)
     |> Card
 
 let getTrumpName =
@@ -51,18 +51,19 @@ let getMinorName card =
 let printRandomCard (Card (suit, card)) =
     match suit with
     | Trump -> printf "%s" (getTrumpName card)
-    | Wand -> printf "Wand %s" (getMinorName card)
-    | Sword -> printf "Sword %s" (getMinorName card)
-    | Cup -> printf "Cup %s" (getMinorName card)
-    | Coin -> printf "Coin %s" (getMinorName card)
+    | Wand  -> printf "%s of Wands" (getMinorName card)
+    | Sword -> printf "%s of Swords" (getMinorName card)
+    | Cup   -> printf "%s of Cups" (getMinorName card)
+    | Coin  -> printf "%s of Pentacles" (getMinorName card)
 
 let matchSuit (input:string) =
     match input.ToLower() with
-    | "major" | "trump" | "m" | "t" -> Trump
-    | "wand" | "w" -> Wand
+    | "major" | "m"
+    | "trump" | "t" -> Trump
+    | "wand"  | "w" -> Wand
     | "sword" | "s" -> Sword
-    | "cup" | "c" -> Cup
-    | "coin" | "p" -> Coin
+    | "cup"   | "c" -> Cup
+    | "coin"  | "p" -> Coin
     | _ -> raise (invalidOp "Bad suit!")
 
 let tryParseSuit (suit:string) =
@@ -75,13 +76,16 @@ let rec readInput () =
     let randomDraw = drawRandomCard
     Console.Write("Enter a suit guess: ")
     let input = Console.ReadLine().Trim()
-    match tryParseSuit(input) with
-    | Some(e) -> 
-        // Print out actual draw
-        printRandomCard randomDraw
-        Console.WriteLine()
-        readInput()
-    | None -> readInput()
+    if input.ToLower() = "exit"
+        then ()
+    else
+        match tryParseSuit(input) with
+        | Some(e) -> 
+            // Print out actual draw
+            printRandomCard randomDraw
+            Console.WriteLine()
+            readInput()
+        | None -> readInput()
 
 [<EntryPoint>]
 let main _ =
