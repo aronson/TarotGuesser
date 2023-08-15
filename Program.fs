@@ -3,32 +3,29 @@ open System
 
 let random = RandomNumberGenerator.Create()
 
-let getOneRandomInt =
-    let bytes = [| 0uy;|]
-    // Get 1 random byte
-    random.GetBytes(bytes, 0, 1)
-    // Cast to int
-    int bytes.[0]
+let getOneRandomInt (min: int) (max: int) =
+    let range = max - min + 1
+    let bytes = Array.zeroCreate 4
+    random.GetBytes(bytes)
+    let num = BitConverter.ToInt32(bytes, 0)
+    min + abs(num) % range
 
 type Suit = | Trump | Wand | Sword | Cup | Coin
 
 type Card = Card of Suit * int
 
 let drawRandomCard = 
-    // Take modulus to find suit
-    let randomSuit = getOneRandomInt
-    let randomOrdinal = getOneRandomInt
-    let suitOrdinal = randomSuit % 5
-    match suitOrdinal with
-    | 0 -> Trump | 1 -> Wand | 2 -> Sword | 3 -> Cup | 4 -> Coin
-    | _ -> raise (invalidOp "RNG machine broke")
-    |> function
-    | Trump -> Trump, (randomOrdinal % 22)
-    | Wand  -> Wand, (randomOrdinal % 14)
-    | Sword -> Sword, (randomOrdinal % 14)
-    | Cup   -> Cup, (randomOrdinal % 14)
-    | Coin  -> Coin, (randomOrdinal % 14)
-    |> Card
+    let randomSuit = getOneRandomInt 0 4
+    let randomOrdinal = getOneRandomInt 0 13
+    let suit = 
+        match randomSuit with
+        | 0 -> Trump | 1 -> Wand | 2 -> Sword | 3 -> Cup | 4 -> Coin
+        | _ -> raise (invalidOp "RNG machine broke")
+    let ordinal = 
+        match suit with
+        | Trump -> randomOrdinal % 22
+        | _ -> randomOrdinal % 14
+    Card (suit, ordinal)
 
 let getTrumpName =
     function
